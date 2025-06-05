@@ -19,12 +19,13 @@ class TodoData extends ChangeNotifier {
 
   List<TodoItem> completedTodos = [];
 
-  void addTodo(String text) {
+  void addTodo(String text, BuildContext context) {
     todos.add(TodoItem(text: text));
     notifyListeners();
+    _showSnackBar(context, 'Todo added');
   }
 
-  void toggleTodo(TodoItem todo) {
+  void toggleTodo(TodoItem todo, BuildContext context) {
     todo.isDone = !todo.isDone;
     if (todo.isDone) {
       todos.remove(todo);
@@ -36,18 +37,26 @@ class TodoData extends ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteTodo(TodoItem todo) {
+  void deleteTodo(TodoItem todo, BuildContext context) {
     if (todo.isDone) {
       completedTodos.remove(todo);
     } else {
       todos.remove(todo);
     }
     notifyListeners();
+    _showSnackBar(context, 'Todo deleted');
   }
 
-  void updateTodo(TodoItem todo, String newText) {
+  void updateTodo(TodoItem todo, String newText, BuildContext context) {
     todo.text = newText;
     notifyListeners();
+    _showSnackBar(context, 'Todo updated');
+  }
+
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }
 
@@ -134,7 +143,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                 Provider.of<TodoData>(
                   context,
                   listen: false,
-                ).addTodo(_textFieldController.text);
+                ).addTodo(_textFieldController.text, context);
                 Navigator.of(context).pop();
                 _textFieldController.clear();
               },
@@ -187,7 +196,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                 Provider.of<TodoData>(
                   context,
                   listen: false,
-                ).updateTodo(todo, editController.text);
+                ).updateTodo(todo, editController.text, context);
                 Navigator.of(context).pop();
                 editController.clear();
               },
@@ -238,11 +247,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                             Provider.of<TodoData>(
                               context,
                               listen: false,
-                            ).deleteTodo(todo);
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Todo dismissed')),
-                            );
+                            ).deleteTodo(todo, context);
                           },
                           background: Container(
                             decoration: BoxDecoration(
@@ -272,7 +277,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                               value: todo.isDone,
                               activeColor: Colors.deepPurple,
                               onChanged: (bool? value) {
-                                todoData.toggleTodo(todo);
+                                todoData.toggleTodo(todo, context);
                               },
                             ),
                             trailing: Row(
@@ -289,7 +294,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                                     Provider.of<TodoData>(
                                       context,
                                       listen: false,
-                                    ).deleteTodo(todo);
+                                    ).deleteTodo(todo, context);
                                   },
                                 ),
                               ],
@@ -323,11 +328,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                               Provider.of<TodoData>(
                                 context,
                                 listen: false,
-                              ).deleteTodo(todo);
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Todo dismissed')),
-                              );
+                              ).deleteTodo(todo, context);
                             },
                             background: Container(
                               decoration: BoxDecoration(
@@ -357,7 +358,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                                 value: todo.isDone,
                                 activeColor: Colors.deepPurple,
                                 onChanged: (bool? value) {
-                                  todoData.toggleTodo(todo);
+                                  todoData.toggleTodo(todo, context);
                                 },
                               ),
                               trailing: Row(
@@ -374,7 +375,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                                       Provider.of<TodoData>(
                                         context,
                                         listen: false,
-                                      ).deleteTodo(todo);
+                                      ).deleteTodo(todo, context);
                                     },
                                   ),
                                 ],
